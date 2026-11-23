@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1120">
+<meta name="description" content="Останній графік погодинних відключень Чернігівської області з Telegram-каналу Чернігівобленерго">
+<title>Графік світла — Чернігівщина</title>
+<style>
+:root{color-scheme:dark;--bg:#0a1020;--card:#141f34;--line:#2b3b58;--ink:#eff5ff;--muted:#a5b6d2;--yellow:#ffd35d;--blue:#9bc2ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--ink);background:radial-gradient(ellipse at 90% 0%,#243958 0%,transparent 52%),var(--bg)}
+a{color:var(--blue)}.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:35px}.brand{display:flex;align-items:center;gap:12px}.brand .mark{font-size:27px;background:#273652;border:1px solid #435474;border-radius:13px;width:48px;height:48px;display:grid;place-items:center}.brand strong{display:block;letter-spacing:.06em}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.07em}.telegram{border:1px solid var(--line);padding:8px 12px;border-radius:99px;text-decoration:none;white-space:nowrap}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--yellow);font-weight:800;text-transform:uppercase}
+h1{font-size:clamp(32px,6vw,54px);line-height:1.13;letter-spacing:-.05em;max-width:800px;margin:8px 0 12px}.lead{color:var(--muted);max-width:680px;margin:0 0 24px}
+.statuses{display:flex;gap:9px;flex-wrap:wrap;margin:19px 0}.status{background:#1b2942;border:1px solid var(--line);border-radius:50px;font-size:12px;padding:8px 12px;color:#c9d8ee}
+.dot{display:inline-block;background:#5ad6a7;width:8px;height:8px;border-radius:50%;margin-right:7px;box-shadow:0 0 10px #5ad6a777}
+.notice{border:1px solid #62583d;border-left:4px solid var(--yellow);background:#27293a;border-radius:15px;padding:16px;margin:15px 0}.notice strong{color:var(--yellow)}.notice p{white-space:pre-line;color:#e0e7f2;font-size:14px}
+.card{background:linear-gradient(145deg,#18253a,#111a2b);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 14px 55px #0004}
+.cardhead{padding:22px 22px 15px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.cardhead h2{font-size:23px;letter-spacing:-.025em;margin:0}.cardhead p{color:var(--muted);font-size:13px;margin:7px 0 0;max-width:720px}
+.picture{background:#edf0ef;min-height:240px;margin:0 18px 18px;border-radius:14px;display:flex;justify-content:center;align-items:center;overflow:hidden}.picture img{max-width:100%;height:auto;cursor:zoom-in;display:block}.empty{color:#4b5f7b;text-align:center;padding:65px 15px}
+.cardfoot{padding:0 22px 22px;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.cardfoot small{color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap}
+button,.button{border:0;border-radius:11px;font:700 14px system-ui,sans-serif;padding:11px 15px;cursor:pointer;text-decoration:none;display:inline-block}.button{background:var(--yellow);color:#1c2430}.secondary{background:transparent;color:var(--ink);border:1px solid var(--line)}
+footer{border-top:1px solid var(--line);margin-top:30px;padding-top:18px;color:var(--muted);font-size:13px}footer a{color:var(--blue)}
+.viewer{position:fixed;inset:0;background:#050916f4;z-index:10;display:grid;place-items:center;padding:48px 10px 12px}.viewer img{max-width:100%;max-height:90vh;object-fit:contain}.viewer button{position:absolute;right:16px;top:12px;background:#273b57;color:white;border:1px solid #53607a}
+.hidden{display:none!important}
+@media(max-width:600px){header{margin-bottom:24px}.brand strong{font-size:13px}.brand small{font-size:10px}.telegram{font-size:12px;padding:7px 9px}.wrap{padding:16px 12px 36px}.cardhead{padding:16px}.cardhead h2{font-size:19px}.picture{margin:0 9px 12px}.cardfoot{padding:0 16px 16px}.brand .mark{width:42px;height:42px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header><div class="brand"><div class="mark" aria-hidden="true">⚡</div><div><strong>ГРАФІК СВІТЛА</strong><small>ЧЕРНІГІВСЬКА ОБЛАСТЬ</small></div></div><a class="telegram" href="https://t.me/chernigivoblenergo" target="_blank" rel="noopener noreferrer">Telegram ↗</a></header>
+<div class="eyebrow">Чернігівобленерго · неофіційне дзеркало</div>
+<h1>Графік відключень — завжди під рукою.</h1>
+<p class="lead">Останнє опубліковане зображення графіка погодинних відключень із публічного Telegram-каналу. Сторінка оновлюється автоматично.</p>
+<div class="statuses"><span class="status"><i class="dot"></i><span id="status">Очікуємо першого оновлення</span></span><span class="status" id="check">Перевіряємо дані…</span></div>
+<section class="notice hidden" id="notice"><strong>⚠️ Останнє уточнення графіка</strong><p id="noticeText"></p><a id="noticeLink" href="https://t.me/chernigivoblenergo" rel="noopener noreferrer" target="_blank">Читати в Telegram ↗</a></section>
+<section class="card">
+  <div class="cardhead"><div><h2>Останній опублікований графік</h2><p id="caption">Завантажуємо дані…</p></div><span class="status" id="published">—</span></div>
+  <div class="picture"><div id="empty" class="empty">⌛<p>Після першого оновлення тут з’явиться графік.</p></div><img id="photo" class="hidden" alt="Графік погодинних відключень Чернігівобленерго"></div>
+  <div class="cardfoot"><small id="details">Натисни на картинку, щоб збільшити.</small><div class="actions"><button id="refresh" class="secondary">↻ Оновити</button><a id="original" class="button" href="https://t.me/chernigivoblenergo" rel="noopener noreferrer" target="_blank">Оригінал ↗</a></div></div>
+</section>
+<footer><b>Важливо:</b> графік може стосуватися наступного дня; після публікації можуть з’являтися зміни. Дізнавайся свій персональний графік на <a target="_blank" rel="noopener noreferrer" href="https://chernihivoblenergo.com.ua/blackouts">офіційному сайті Чернігівобленерго</a>. Цей ресурс не є офіційним сайтом компанії. Затримка оновлення залежить від GitHub Actions.</footer>
+</main>
+<div class="viewer hidden" id="viewer" role="dialog" aria-label="Збільшена картинка"><button id="close">✕</button><img id="large" alt="Збільшений графік"></div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const fmt=t=>{if(!t)return "Час невідомий";const d=new Date(t);return isNaN(d.getTime())?"Час невідомий":new Intl.DateTimeFormat("uk-UA",{timeZone:"Europe/Kyiv",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}).format(d)};
+let key="",busy=false;
+function zoom(src){$("large").src=src;$("viewer").classList.remove("hidden");document.body.style.overflow="hidden"}
+function closeZoom(){$("viewer").classList.add("hidden");document.body.style.overflow=""}
+$("close").onclick=closeZoom;
+$("viewer").onclick=e=>{if(e.target===$("viewer"))closeZoom()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeZoom()});
+$("photo").onclick=()=>zoom($("photo").src);
+async function update(){
+ if(busy)return;busy=true;
+ try{
+  const r=await fetch("data.json?time="+Date.now(),{cache:"no-store"});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const d=await r.json();
+  $("check").textContent=d.checked_at?"Перевірено: "+fmt(d.checked_at):"Ще немає перевірки";
+  const p=d.latest_chart;
+  if(p){
+   const next=p.id+":"+p.media_key;
+   if(key!==next){$("photo").src=p.image+"?v="+encodeURIComponent(p.media_key||p.id);$("photo").classList.remove("hidden");$("empty").classList.add("hidden");$("caption").textContent=(p.text||"").slice(0,300);$("published").textContent=fmt(p.date);$("original").href=p.link;$("details").textContent="Опубліковано: "+fmt(p.date)+" · Натисни на фото для збільшення";key=next}
+   const n=d.latest_notice;if(n&&n.id>p.id){$("notice").classList.remove("hidden");$("noticeText").textContent=(n.text||"").slice(0,650);$("noticeLink").href=n.link}else{$("notice").classList.add("hidden")}
+   $("status").textContent="Графік отримано";
+  }else{$("status").textContent="Очікуємо першого графіка"}
+ }catch(e){$("status").textContent="Не вдалося оновити дані";console.warn(e)}
+ finally{busy=false}
+}
+$("refresh").onclick=update;update();setInterval(update,20000);
+</script>
+</body>
+</html>
