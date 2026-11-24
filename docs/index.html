@@ -27,9 +27,9 @@ h1,h2{font-size:clamp(19px,3vw,25px);line-height:1.2;letter-spacing:-.025em;marg
 h1{font-size:clamp(20px,4vw,27px)}
 .tag{font-weight:700;font-size:11px;letter-spacing:.06em;padding:5px 9px;background:#264335;border:1px solid #356d52;color:#a6e9c4;border-radius:50px;white-space:nowrap}
 .secondarytag{color:#bbcee9;border-color:var(--border);background:#22314a}
-.photo{margin:0 12px;min-height:240px;background:#edf1f3;display:grid;place-items:center;border-radius:12px;overflow:hidden}
+.photo{margin:0 12px;min-height:240px;background:#17273b;display:grid;place-items:center;border-radius:12px;overflow:hidden}
 .photo img{display:block;width:100%;height:auto;max-height:1400px;object-fit:contain;cursor:zoom-in}
-.photo-sm{max-width:780px;margin:0 12px;background:#e8eced}
+.photo-sm{max-width:780px;margin:0 12px;background:#17273b}
 .photo-sm img{max-height:800px}
 .empty{padding:45px 16px;color:#43536a;text-align:center;font-weight:600;max-width:420px}
 .content{padding:15px 20px 21px}
@@ -192,32 +192,49 @@ footer{color:var(--muted);border-top:1px solid #273951;font-size:12px;padding:16
 }
 
 
-/* Village / outage group identifier, visible above all three cards. */
-.location-banner{
-  display:flex;
+/* Header: location in the centre, not a separate full-width panel. */
+header{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
   align-items:center;
-  justify-content:center;
-  gap:8px;
-  margin:0 0 12px;
-  padding:9px 14px;
-  border:1px solid #536582;
-  border-radius:12px;
-  background:#21334d;
-  color:var(--ink);
-  font-size:clamp(16px,2.1vw,21px);
+}
+header .identity{grid-column:1;justify-self:start}
+.location-banner{
+  grid-column:2;
+  justify-self:center;
+  color:#ffdc85;
+  background:none;
+  border:0;
+  padding:0;
+  margin:0;
+  font-size:clamp(16px,1.55vw,22px);
   font-weight:800;
-  line-height:1.2;
-  letter-spacing:.01em;
+  line-height:1.25;
   text-align:center;
+  white-space:nowrap;
 }
-@media(max-width:600px){
-  .location-banner{padding:8px 10px;margin-bottom:10px;border-radius:10px;font-size:16px}
+header .headerlink{grid-column:3;justify-self:end}
+@media(max-width:899px){
+  header{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:5px}
+  header .identity{grid-column:1;grid-row:1}
+  header .headerlink{grid-column:2;grid-row:1}
+  .location-banner{grid-column:1/-1;grid-row:2;font-size:16px}
 }
-@media(min-width:900px){
-  .location-banner{flex:0 0 auto;margin:0 0 6px;padding:5px 10px;font-size:16px;line-height:1.15}
+@media(min-width:1200px){
+  .stack{
+    grid-template-columns:minmax(0,1.18fr) minmax(0,1fr) minmax(0,.95fr);
+    grid-template-rows:minmax(0,1fr);
+    grid-template-areas:"current previous changes";
+  }
+  .change-body .change-text{
+    display:block;
+    overflow-y:auto;
+    -webkit-line-clamp:unset;
+    line-clamp:unset;
+  }
 }
 @media(min-width:900px) and (max-height:650px){
-  .location-banner{margin-bottom:4px;padding:3px 9px;font-size:14px}
+  .location-banner{font-size:15px}
 }
 
 </style>
@@ -226,9 +243,9 @@ footer{color:var(--muted);border-top:1px solid #273951;font-size:12px;padding:16
 <main class="page">
 <header>
  <div class="identity"><span class="bolt">⚡</span><div><b>ГРАФІК СВІТЛА</b><small>ЧЕРНІГІВСЬКА ОБЛАСТЬ</small></div></div>
+ <div class="location-banner" aria-label="Населений пункт і черга відключень">с. Піски — група 5.2</div>
  <a class="headerlink" href="https://t.me/chernigivoblenergo" target="_blank" rel="noopener noreferrer">Telegram ↗</a>
 </header>
-<div class="location-banner" aria-label="Населений пункт і черга відключень">с.Піски - група 5.2</div>
 <div class="stack">
  <section class="panel panel-primary" aria-labelledby="currentTitle">
   <div class="panel-head"><div class="panel-title"><span class="index">01</span><h1 id="currentTitle">Останній графік відключень</h1></div><span class="tag">АКТУАЛЬНИЙ</span></div>
