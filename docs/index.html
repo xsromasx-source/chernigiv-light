@@ -221,10 +221,12 @@ header .headerlink{grid-column:3;justify-self:end}
   .location-banner{grid-column:1/-1;grid-row:2;font-size:16px}
 }
 @media(min-width:1200px){
+  /* Wide reassembled chart gets the larger left card; the two smaller cards
+     still share the right-hand column so all three fit a single screen. */
   .stack{
-    grid-template-columns:minmax(0,1.18fr) minmax(0,1fr) minmax(0,.95fr);
-    grid-template-rows:minmax(0,1fr);
-    grid-template-areas:"current previous changes";
+    grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);
+    grid-template-rows:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:"current previous" "current changes";
   }
   .change-body .change-text{
     display:block;
