@@ -21,6 +21,13 @@ DOCS = Path(__file__).resolve().parent / "docs"
 IMAGE_DIR = DOCS / "assets" / "charts"
 HEADERS = {"User-Agent": "Mozilla/5.0", "Accept-Language": "uk,en;q=0.8"}
 SCHEDULE = re.compile(r"графік[ауі]?\s+погодинних\s+відключень|графіку\s+погодинних\s+відключень|\bгпв\b", re.I)
+CHANGES = re.compile(
+    r"маємо\s+зміни|зміни\s+(?:у|в|до)\s+графік|"
+    r"графік\s+(?:скориговано|змінено|оновлено)|"
+    r"коригування\s+графік|"
+    r"додатково\s+відключається|продовжується\s+відключення",
+    re.I,
+)
 CSS_URL = re.compile(r"url\(\s*['\"]?(https?://[^)'\"\s]+)['\"]?\s*\)", re.I)
 
 
@@ -36,7 +43,7 @@ def parse_posts(html):
         except ValueError:
             continue
         text_el = el.select_one(".tgme_widget_message_text")
-        text = text_el.get_text(" ", strip=True) if text_el else ""
+        text = text_el.get_text("\n", strip=True) if text_el else ""
         time_el = el.select_one("time[datetime]")
         date = time_el.get("datetime", "") if time_el else ""
         photos = []
@@ -53,7 +60,7 @@ def parse_posts(html):
 def get_posts(session):
     collected = {}
     before = None
-    for _ in range(5):
+    for _ in range(12):
         params = {"before": before} if before else None
         response = session.get(BASE, params=params, headers=HEADERS, timeout=30)
         response.raise_for_status()
@@ -61,8 +68,11 @@ def get_posts(session):
         if not page:
             raise RuntimeError("Telegram did not return public posts")
         collected.update({post["id"]: post for post in page})
-        if any(SCHEDULE.search(p["text"][:520]) and p["photos"]
-               for p in collected.values()):
+        charts = [p for p in collected.values()
+                  if SCHEDULE.search(p["text"][:600]) and p["photos"]]
+        changes = [p for p in collected.values()
+                   if SCHEDULE.search(p["text"][:600]) and CHANGES.search(p["text"][:320])]
+        if len(charts) >= 2 and changes:
             break
         old = min(p["id"] for p in page)
         if before is not None and old >= before:
@@ -102,31 +112,65 @@ def fetch_image(session, url, post_id):
     return "assets/charts/" + name
 
 
+def public_post(post):
+    return {key: post[key] for key in ("id", "text", "date", "link")}
+
+
+def chart_item(session, post):
+    item = public_post(post)
+    image = fetch_image(session, post["photos"][0], post["id"])
+    item["image"] = image
+    item["media_key"] = image.rsplit("/", 1)[-1]
+    return item
+
+
 def main():
     DOCS.mkdir(parents=True, exist_ok=True)
     session = requests.Session()
     posts = get_posts(session)
-    matching = [p for p in posts if SCHEDULE.search(p["text"][:520])]
-    if not matching:
-        raise RuntimeError("No schedule posts found in recent Telegram messages")
-    photo_post = next((p for p in matching if p["photos"]), None)
-    if not photo_post:
-        raise RuntimeError("No image in recent schedule posts")
-    image = fetch_image(session, photo_post["photos"][0], photo_post["id"])
-    newest = matching[0]
-    chart = {key: photo_post[key] for key in ("id", "text", "date", "link")}
-    chart["image"] = image
-    chart["media_key"] = image.split("/")[-1]
-    notice = {key: newest[key] for key in ("id", "text", "date", "link")}
+
+    # A schedule with a photo is a graph. Changes often come as text-only posts,
+    # and must not replace the chart image.
+    charts = [p for p in posts if p["photos"] and SCHEDULE.search(p["text"][:600])]
+    normal_charts = [p for p in charts if not CHANGES.search(p["text"][:320])]
+    if not charts:
+        raise RuntimeError("No schedule images found in recent Telegram posts")
+
+    # Prefer regular graph publications over an attached image in a correction
+    # only if the latter is not actually the newer graphic.
+    ordered = sorted(charts, key=lambda p: p["id"], reverse=True)
+    latest = chart_item(session, ordered[0])
+    previous = None
+    if len(ordered) > 1:
+        try:
+            previous = chart_item(session, ordered[1])
+        except Exception:
+            logging.exception("Could not download previous schedule image")
+    elif normal_charts and normal_charts[0]["id"] != ordered[0]["id"]:
+        try:
+            previous = chart_item(session, normal_charts[0])
+        except Exception:
+            logging.exception("Could not download older schedule image")
+
+    updates = [p for p in posts
+               if SCHEDULE.search(p["text"][:600]) and CHANGES.search(p["text"][:320])]
+    notice = public_post(updates[0]) if updates else None
     payload = {
         "channel": CHANNEL,
         "checked_at": datetime.now(timezone.utc).isoformat(),
-        "latest_chart": chart,
+        "latest_chart": latest,
+        "previous_chart": previous,
+        "latest_change": notice,
+        # Legacy clients:
         "latest_notice": notice,
-        "history": [chart],
+        "history": [item for item in (latest, previous) if item],
     }
-    (DOCS / "data.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    logging.info("Published Telegram post %s, recent notice %s", chart["id"], notice["id"])
+    (DOCS / "data.json").write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    logging.info("Latest graph: %s; previous graph: %s; last change: %s",
+                 latest["id"], previous["id"] if previous else None,
+                 notice["id"] if notice else None)
 
 
 if __name__ == "__main__":
