@@ -4,76 +4,201 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a1120">
-<meta name="description" content="Останній графік погодинних відключень Чернігівської області з Telegram-каналу Чернігівобленерго">
-<title>Графік світла — Чернігівщина</title>
+<meta name="description" content="Актуальний і попередній графіки погодинних відключень Чернігівщини та останні зміни із Telegram">
+<title>Графіки відключень — Чернігівщина</title>
 <style>
-:root{color-scheme:dark;--bg:#0a1020;--card:#141f34;--line:#2b3b58;--ink:#eff5ff;--muted:#a5b6d2;--yellow:#ffd35d;--blue:#9bc2ff}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--ink);background:radial-gradient(ellipse at 90% 0%,#243958 0%,transparent 52%),var(--bg)}
-a{color:var(--blue)}.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.brand{display:flex;align-items:center;gap:12px}.brand .mark{font-size:27px;background:#273652;border:1px solid #435474;border-radius:13px;width:48px;height:48px;display:grid;place-items:center}.brand strong{display:block;letter-spacing:.06em}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.07em}.telegram{border:1px solid var(--line);padding:8px 12px;border-radius:99px;text-decoration:none;white-space:nowrap}
-.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--yellow);font-weight:800;text-transform:uppercase}
-h1{font-size:clamp(21px,4vw,28px);line-height:1.2;letter-spacing:-.03em;max-width:800px;margin:8px 0 12px}.lead{color:var(--muted);max-width:680px;margin:0 0 18px}.about{margin-top:24px}
-.statuses{display:flex;gap:9px;flex-wrap:wrap;margin:19px 0}.status{background:#1b2942;border:1px solid var(--line);border-radius:50px;font-size:12px;padding:8px 12px;color:#c9d8ee}
-.dot{display:inline-block;background:#5ad6a7;width:8px;height:8px;border-radius:50%;margin-right:7px;box-shadow:0 0 10px #5ad6a777}
-.notice{border:1px solid #62583d;border-left:4px solid var(--yellow);background:#27293a;border-radius:15px;padding:16px;margin:15px 0}.notice strong{color:var(--yellow)}.notice p{white-space:pre-line;color:#e0e7f2;font-size:14px}
-.card{background:linear-gradient(145deg,#18253a,#111a2b);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 14px 55px #0004}
-.cardhead{padding:22px 22px 15px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.cardhead h2{font-size:23px;letter-spacing:-.025em;margin:0}.cardhead p{color:var(--muted);font-size:13px;margin:7px 0 0;max-width:720px}
-.picture{background:#edf0ef;min-height:240px;margin:12px 12px 0;border-radius:14px;display:flex;justify-content:center;align-items:center;overflow:hidden}.picture img{max-width:100%;height:auto;cursor:zoom-in;display:block}.empty{color:#4b5f7b;text-align:center;padding:65px 15px}
-.cardfoot{padding:0 22px 22px;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.cardfoot small{color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap}
-button,.button{border:0;border-radius:11px;font:700 14px system-ui,sans-serif;padding:11px 15px;cursor:pointer;text-decoration:none;display:inline-block}.button{background:var(--yellow);color:#1c2430}.secondary{background:transparent;color:var(--ink);border:1px solid var(--line)}
-footer{border-top:1px solid var(--line);margin-top:30px;padding-top:18px;color:var(--muted);font-size:13px}footer a{color:var(--blue)}
-.viewer{position:fixed;inset:0;background:#050916f4;z-index:10;display:grid;place-items:center;padding:48px 10px 12px}.viewer img{max-width:100%;max-height:90vh;object-fit:contain}.viewer button{position:absolute;right:16px;top:12px;background:#273b57;color:white;border:1px solid #53607a}
+:root{color-scheme:dark;--bg:#0b1220;--panel:#151f31;--border:#34435b;--ink:#f0f5ff;--muted:#adbad0;--accent:#ffcf56;--link:#b9d6ff;--green:#69d9aa}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 95% -5%,#243c5a 0%,transparent 48%),var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+a{color:var(--link)}
+.page{max-width:980px;margin:0 auto;padding:14px 14px 46px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 2px 16px}
+.identity{display:flex;align-items:center;gap:12px}.bolt{display:grid;place-items:center;background:#253b59;width:45px;height:45px;border-radius:13px;font-size:25px}
+.identity b{display:block;font-size:16px;line-height:1.15;letter-spacing:.025em}.identity small{display:block;font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.headerlink{border:1px solid var(--border);border-radius:100px;padding:8px 13px;text-decoration:none;white-space:nowrap;font-size:13px}
+.stack{display:grid;gap:20px}
+.panel{background:linear-gradient(145deg,#19273d,#101a2a);border:1px solid var(--border);border-radius:19px;box-shadow:0 14px 35px #0003;overflow:hidden}
+.panel-primary{border-color:#576d88}
+.panel-head{padding:19px 20px 12px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.panel-title{display:flex;align-items:center;gap:11px;min-width:0}
+.index{width:32px;height:32px;flex:none;border-radius:10px;background:#2e4261;display:grid;place-items:center;font-size:12px;font-weight:800;color:#c6dafc}
+.panel-primary .index{background:#4d432d;color:var(--accent)}
+h1,h2{font-size:clamp(19px,3vw,25px);line-height:1.2;letter-spacing:-.025em;margin:0}
+h1{font-size:clamp(20px,4vw,27px)}
+.tag{font-weight:700;font-size:11px;letter-spacing:.06em;padding:5px 9px;background:#264335;border:1px solid #356d52;color:#a6e9c4;border-radius:50px;white-space:nowrap}
+.secondarytag{color:#bbcee9;border-color:var(--border);background:#22314a}
+.photo{margin:0 12px;min-height:240px;background:#edf1f3;display:grid;place-items:center;border-radius:12px;overflow:hidden}
+.photo img{display:block;width:100%;height:auto;max-height:1400px;object-fit:contain;cursor:zoom-in}
+.photo-sm{max-width:780px;margin:0 12px;background:#e8eced}
+.photo-sm img{max-height:800px}
+.empty{padding:45px 16px;color:#43536a;text-align:center;font-weight:600;max-width:420px}
+.content{padding:15px 20px 21px}
+.meta{color:var(--muted);font-size:13px;margin:0 0 12px}
+details{background:#202d42;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;font-weight:700;font-size:14px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"⌄";font-size:19px;line-height:1;transition:transform .2s}
+details[open] summary::after{transform:rotate(180deg)}
+.spoiler-text{white-space:pre-line;margin:0;padding:0 14px 15px;color:#e2eaf7;font-size:14px;overflow-wrap:anywhere}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--accent);color:#172133;border:0;border-radius:10px;padding:10px 15px;font:700 14px system-ui,sans-serif;text-decoration:none;cursor:pointer;display:inline-flex;gap:5px;align-items:center;justify-content:center}
+.btn-alt{background:#263751;color:var(--ink);border:1px solid #3f5372}
+.change-body{padding:0 20px 21px}
+.change-text{white-space:pre-line;overflow-wrap:anywhere;font-size:15px;background:#242b3d;border-left:4px solid var(--accent);padding:15px;border-radius:0 12px 12px 0;margin:8px 0 16px}
+.change-empty{color:var(--muted);font-size:14px}
+.checkline{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:var(--muted);font-size:12px;padding:18px 4px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px #5acc9b77;margin-right:6px}
+footer{color:var(--muted);border-top:1px solid #273951;font-size:12px;padding:16px 3px}
+.overlay{position:fixed;inset:0;z-index:50;background:#050910f5;display:grid;place-items:center;padding:55px 10px 10px}
+.overlay img{max-height:calc(100vh - 75px);max-width:100%;object-fit:contain}
+.overlay button{position:absolute;right:16px;top:12px;border:1px solid #657088;border-radius:10px;color:white;background:#30415c;padding:9px 14px;cursor:pointer}
 .hidden{display:none!important}
-@media(max-width:600px){header{margin-bottom:10px}.brand strong{font-size:13px}.brand small{font-size:10px}.telegram{font-size:12px;padding:7px 9px}.wrap{padding:16px 12px 36px}.cardhead{padding:16px}.cardhead h2{font-size:19px}.picture{margin:8px 8px 0}.cardfoot{padding:0 16px 16px}.brand .mark{width:42px;height:42px}}
+@media(max-width:600px){.page{padding:8px 8px 32px}header{padding:9px 5px 12px}.identity b{font-size:13px}.identity small{font-size:10px}.bolt{width:38px;height:38px;font-size:22px}.headerlink{font-size:12px;padding:7px 10px}.stack{gap:14px}.panel{border-radius:14px}.panel-head{padding:13px 12px 10px}.index{width:28px;height:28px}.panel-title{gap:8px}h1,h2{font-size:19px}.tag{font-size:10px;padding:4px 7px}.photo,.photo-sm{margin:0 7px;min-height:175px}.content,.change-body{padding:12px 13px 16px}.change-body{padding-top:0}.change-text{padding:12px}.btn{padding:10px 12px}.meta{margin-bottom:10px}}
 </style>
 </head>
 <body>
-<main class="wrap">
-<header><div class="brand"><div class="mark" aria-hidden="true">⚡</div><div><strong>ГРАФІК СВІТЛА</strong><small>ЧЕРНІГІВСЬКА ОБЛАСТЬ</small></div></div><a class="telegram" href="https://t.me/chernigivoblenergo" target="_blank" rel="noopener noreferrer">Telegram ↗</a></header>
-<section class="card">
-  <div class="picture"><div id="empty" class="empty">⌛<p>Після першого оновлення тут з’явиться графік.</p></div><img id="photo" class="hidden" alt="Графік погодинних відключень Чернігівобленерго"></div>
-  <div class="cardhead"><div><h2>Останній опублікований графік</h2><p id="caption">Завантажуємо дані…</p></div><span class="status" id="published">—</span></div>
-  <div class="cardfoot"><small id="details">Натисни на картинку, щоб збільшити.</small><div class="actions"><button id="refresh" class="secondary">↻ Оновити</button><a id="original" class="button" href="https://t.me/chernigivoblenergo" rel="noopener noreferrer" target="_blank">Оригінал ↗</a></div></div>
-</section>
-<section class="notice hidden" id="notice"><strong>⚠️ Останнє уточнення графіка</strong><p id="noticeText"></p><a id="noticeLink" href="https://t.me/chernigivoblenergo" rel="noopener noreferrer" target="_blank">Читати в Telegram ↗</a></section>
-<div class="statuses"><span class="status"><i class="dot"></i><span id="status">Очікуємо першого оновлення</span></span><span class="status" id="check">Перевіряємо дані…</span></div>
-<section class="about">
-  <div class="eyebrow">Чернігівобленерго · неофіційне дзеркало</div>
-  <h1>Графік відключень — завжди під рукою.</h1>
-  <p class="lead">Останнє опубліковане зображення графіка погодинних відключень із публічного Telegram-каналу. Сторінка оновлюється автоматично.</p>
-</section>
-<footer><b>Важливо:</b> графік може стосуватися наступного дня; після публікації можуть з’являтися зміни. Дізнавайся свій персональний графік на <a target="_blank" rel="noopener noreferrer" href="https://chernihivoblenergo.com.ua/blackouts">офіційному сайті Чернігівобленерго</a>. Цей ресурс не є офіційним сайтом компанії. Затримка оновлення залежить від GitHub Actions.</footer>
+<main class="page">
+<header>
+ <div class="identity"><span class="bolt">⚡</span><div><b>ГРАФІК СВІТЛА</b><small>ЧЕРНІГІВСЬКА ОБЛАСТЬ</small></div></div>
+ <a class="headerlink" href="https://t.me/chernigivoblenergo" target="_blank" rel="noopener noreferrer">Telegram ↗</a>
+</header>
+<div class="stack">
+ <section class="panel panel-primary" aria-labelledby="currentTitle">
+  <div class="panel-head"><div class="panel-title"><span class="index">01</span><h1 id="currentTitle">Останній графік відключень</h1></div><span class="tag">АКТУАЛЬНИЙ</span></div>
+  <div class="photo">
+   <div class="empty" id="currentEmpty">Очікуємо зображення останнього графіка…</div>
+   <img id="currentImg" class="hidden" alt="Останній графік погодинних відключень">
+  </div>
+  <div class="content">
+   <p class="meta" id="currentMeta">Дата публікації: —</p>
+   <details id="currentSpoiler"><summary>Показати текст повідомлення</summary><p class="spoiler-text" id="currentText"></p></details>
+   <div class="actions">
+    <button class="btn btn-alt" id="refresh">↻ Оновити</button>
+    <a class="btn" id="currentLink" href="https://t.me/chernigivoblenergo" target="_blank" rel="noopener noreferrer">Оригінал у Telegram ↗</a>
+   </div>
+  </div>
+ </section>
+ <section class="panel" aria-labelledby="previousTitle">
+  <div class="panel-head"><div class="panel-title"><span class="index">02</span><h2 id="previousTitle">Попередній графік</h2></div><span class="tag secondarytag">АРХІВ</span></div>
+  <div class="photo photo-sm">
+   <div class="empty" id="previousEmpty">Попередній графік поки що недоступний.</div>
+   <img id="previousImg" class="hidden" alt="Попередній графік погодинних відключень">
+  </div>
+  <div class="content">
+   <p class="meta" id="previousMeta">Дата публікації: —</p>
+   <details id="previousSpoiler" class="hidden"><summary>Показати текст попереднього графіка</summary><p class="spoiler-text" id="previousText"></p></details>
+   <div class="actions"><a id="previousLink" class="btn btn-alt hidden" href="https://t.me/chernigivoblenergo" target="_blank" rel="noopener noreferrer">Попередній допис ↗</a></div>
+  </div>
+ </section>
+ <section class="panel" aria-labelledby="changesTitle">
+  <div class="panel-head"><div class="panel-title"><span class="index">03</span><h2 id="changesTitle">Останні зміни до графіка</h2></div></div>
+  <div class="change-body">
+   <p class="meta" id="changeMeta">Дата публікації: —</p>
+   <p class="change-text change-empty" id="changePreview">Перевіряємо останні уточнення графіка…</p>
+   <details id="changeSpoiler" class="hidden"><summary>Повний текст повідомлення</summary><p class="spoiler-text" id="changeText"></p></details>
+   <div class="actions"><a id="changeLink" class="btn btn-alt hidden" target="_blank" rel="noopener noreferrer" href="https://t.me/chernigivoblenergo">Відкрити зміну в Telegram ↗</a></div>
+  </div>
+ </section>
+</div>
+<div class="checkline"><span><span class="dot"></span><span id="status">Очікуємо дані</span></span><span id="check">Перевірка ще не виконувалася</span></div>
+<footer>Неофіційне дзеркало публікацій <a target="_blank" rel="noopener noreferrer" href="https://t.me/chernigivoblenergo">Чернігівобленерго</a>. Графіки можуть змінюватися протягом дня. Персональний графік перевіряй на <a target="_blank" rel="noopener noreferrer" href="https://chernihivoblenergo.com.ua/blackouts">офіційному сайті</a>. GitHub Actions оновлює дані з можливою затримкою.</footer>
 </main>
-<div class="viewer hidden" id="viewer" role="dialog" aria-label="Збільшена картинка"><button id="close">✕</button><img id="large" alt="Збільшений графік"></div>
+<div id="viewer" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Перегляд графіка"><button type="button" id="closeViewer" aria-label="Закрити">✕ Закрити</button><img id="large" alt="Збільшений графік"></div>
 <script>
 "use strict";
-const $=id=>document.getElementById(id);
-const fmt=t=>{if(!t)return "Час невідомий";const d=new Date(t);return isNaN(d.getTime())?"Час невідомий":new Intl.DateTimeFormat("uk-UA",{timeZone:"Europe/Kyiv",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}).format(d)};
-let key="",busy=false;
-function zoom(src){$("large").src=src;$("viewer").classList.remove("hidden");document.body.style.overflow="hidden"}
-function closeZoom(){$("viewer").classList.add("hidden");document.body.style.overflow=""}
-$("close").onclick=closeZoom;
-$("viewer").onclick=e=>{if(e.target===$("viewer"))closeZoom()};
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeZoom()});
-$("photo").onclick=()=>zoom($("photo").src);
-async function update(){
+const $ = id => document.getElementById(id);
+const formatDate = value => {
+ if (!value) return "Час невідомий";
+ const date = new Date(value);
+ return Number.isNaN(date.getTime()) ? "Час невідомий" :
+   new Intl.DateTimeFormat("uk-UA",{timeZone:"Europe/Kyiv",day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"}).format(date);
+};
+const safeLink = value => typeof value === "string" && /^https:\/\/t\.me\/chernigivoblenergo\/\d+$/.test(value) ? value : "https://t.me/chernigivoblenergo";
+let busy = false;
+let currentKey = "";
+let previousKey = "";
+function fillChart(prefix, post) {
+ const img = $(prefix+"Img"), empty = $(prefix+"Empty"), spoiler = $(prefix+"Spoiler"), meta = $(prefix+"Meta");
+ const link = $(prefix+"Link");
+ if (!post || !post.image) {
+  img.classList.add("hidden");empty.classList.remove("hidden");
+  if(prefix==="previous"){link.classList.add("hidden");spoiler.classList.add("hidden");}
+  meta.textContent="Дату публікації поки не отримано";
+  return;
+ }
+ const mediaKey = String(post.media_key || post.id);
+ const key = post.id+":"+mediaKey;
+ const before = prefix==="current"?currentKey:previousKey;
+ if (key !== before) {
+  img.src=post.image+"?v="+encodeURIComponent(mediaKey);
+  img.classList.remove("hidden");empty.classList.add("hidden");
+  if(prefix==="current")currentKey=key;else previousKey=key;
+ }
+ meta.textContent="Опубліковано: "+formatDate(post.date);
+ $(prefix+"Text").textContent=post.text||"Текст відсутній.";
+ link.href=safeLink(post.link);
+ link.classList.remove("hidden");
+ spoiler.classList.remove("hidden");
+}
+function changeSummary(text) {
+ const cut=text.split(/(?:⚠️\s*Якщо ситуація|🤔\s*Нагадуємо|🙏\s*Як і раніше)/i)[0].trim();
+ const meaningful=cut || text;
+ return meaningful.length>750 ? meaningful.slice(0,748)+"…" : meaningful;
+}
+function fillChange(post) {
+ if(!post || !post.text){
+  $("changeMeta").textContent="Уточнень у переглянутих дописах не знайдено";
+  $("changePreview").textContent="Окремих повідомлень про зміну графіка поки немає.";
+  $("changePreview").classList.add("change-empty");
+  $("changeSpoiler").classList.add("hidden");
+  $("changeLink").classList.add("hidden");
+  return;
+ }
+ $("changeMeta").textContent="Опубліковано: "+formatDate(post.date)+" · Перевіряй дату, якої стосується уточнення";
+ $("changePreview").textContent=changeSummary(post.text);
+ $("changePreview").classList.remove("change-empty");
+ $("changeText").textContent=post.text;
+ $("changeSpoiler").classList.remove("hidden");
+ $("changeLink").href=safeLink(post.link);
+ $("changeLink").classList.remove("hidden");
+}
+function showLarge(img){
+ if(img.classList.contains("hidden")||!img.src)return;
+ $("large").src=img.src;$("viewer").classList.remove("hidden");document.body.style.overflow="hidden";
+}
+function closeLarge(){$("viewer").classList.add("hidden");document.body.style.overflow="";}
+$("currentImg").onclick=()=>showLarge($("currentImg"));
+$("previousImg").onclick=()=>showLarge($("previousImg"));
+$("closeViewer").onclick=closeLarge;
+$("viewer").onclick=event=>{if(event.target===$("viewer"))closeLarge()};
+document.addEventListener("keydown",event=>{if(event.key==="Escape")closeLarge()});
+for(const prefix of ["current","previous"]){
+ $(prefix+"Img").addEventListener("error",()=>{
+  $(prefix+"Img").classList.add("hidden");$(prefix+"Empty").classList.remove("hidden");
+  $(prefix+"Empty").textContent="Зображення тимчасово не завантажилося. Перевір Telegram-допис.";
+ });
+}
+async function refreshData() {
  if(busy)return;busy=true;
  try{
-  const r=await fetch("data.json?time="+Date.now(),{cache:"no-store"});
-  if(!r.ok)throw new Error("HTTP "+r.status);
-  const d=await r.json();
-  $("check").textContent=d.checked_at?"Перевірено: "+fmt(d.checked_at):"Ще немає перевірки";
-  const p=d.latest_chart;
-  if(p){
-   const next=p.id+":"+p.media_key;
-   if(key!==next){$("photo").src=p.image+"?v="+encodeURIComponent(p.media_key||p.id);$("photo").classList.remove("hidden");$("empty").classList.add("hidden");$("caption").textContent=(p.text||"").slice(0,300);$("published").textContent=fmt(p.date);$("original").href=p.link;$("details").textContent="Опубліковано: "+fmt(p.date)+" · Натисни на фото для збільшення";key=next}
-   const n=d.latest_notice;if(n&&n.id>p.id){$("notice").classList.remove("hidden");$("noticeText").textContent=(n.text||"").slice(0,650);$("noticeLink").href=n.link}else{$("notice").classList.add("hidden")}
-   $("status").textContent="Графік отримано";
-  }else{$("status").textContent="Очікуємо першого графіка"}
- }catch(e){$("status").textContent="Не вдалося оновити дані";console.warn(e)}
+  const response=await fetch("data.json?t="+Date.now(),{cache:"no-store"});
+  if(!response.ok)throw new Error("HTTP "+response.status);
+  const data=await response.json();
+  const current=data.latest_chart || (data.history||[])[0] || null;
+  const previous=data.previous_chart || (data.history||[]).find(post=>current&&post.id!==current.id) || null;
+  fillChart("current",current);
+  fillChart("previous",previous);
+  const legacy=data.latest_notice;
+  const change=data.latest_change || (legacy && /маємо\s+зміни|зміни\s+[ув]\s+графік/i.test(legacy.text||"") ? legacy : null);
+  fillChange(change);
+  $("check").textContent=data.checked_at?"Дані перевірено: "+formatDate(data.checked_at):"Ще немає успішної перевірки Telegram";
+  $("status").textContent=current?"Дані графіків отримано":"Очікуємо першого завантаження";
+ }catch(error){$("status").textContent="Помилка отримання даних";console.warn(error)}
  finally{busy=false}
 }
-$("refresh").onclick=update;update();setInterval(update,20000);
+$("refresh").onclick=refreshData;
+refreshData();
+setInterval(refreshData,20000);
 </script>
 </body>
 </html>
