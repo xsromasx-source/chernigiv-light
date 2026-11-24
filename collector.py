@@ -239,14 +239,30 @@ def create_horizontal_chart(image_path, post_id):
         if min(before_height, after_height) / max(before_height, after_height) < .52:
             return None
 
-        header = original.crop((0, 0, width, top_groups))
+        # Shrink only the unused vertical band between the heading and the
+        # first row of tiles; keep all text, logos and chart cells.
+        last_header_ink = None
+        ink_threshold = max(3, int(sw * .016 / step))
+        for y in range(first_row):
+            ink = 0
+            for x in range(0, sw, step):
+                red, green, blue = pixels[x, y]
+                if min(red, green, blue) < 205:
+                    ink += 1
+            if ink >= ink_threshold:
+                last_header_ink = y
+        header_bottom = top_groups
+        if last_header_ink is not None:
+            header_bottom = min(top_groups,
+                                max(30, round((last_header_ink + 10) * sy)))
+        header = original.crop((0, 0, width, header_bottom))
         first = original.crop((0, top_groups, width, divide))
         second = original.crop((0, divide, width, height))
 
         gutter = max(12, round(width * .025))
         out_width = 2 * width + gutter
         # Double the size of the heading to fit the combined lower sections.
-        header_height = round(top_groups * out_width / width)
+        header_height = round(header.height * out_width / width)
         margin = max(8, round(width * .012))
         out_height = header_height + margin + max(first.height, second.height)
         combined = Image.new("RGB", (out_width, out_height), "#f8fafb")
@@ -258,7 +274,7 @@ def create_horizontal_chart(image_path, post_id):
         combined.save(stream, "JPEG", quality=94, optimize=True)
         raw = stream.getvalue()
         digest = hashlib.sha256(raw).hexdigest()[:12]
-        name = str(post_id) + "-horizontal-v1-" + digest + ".jpg"
+        name = str(post_id) + "-horizontal-v2-" + digest + ".jpg"
         IMAGE_DIR.mkdir(parents=True, exist_ok=True)
         dest = IMAGE_DIR / name
         dest.write_bytes(raw)
