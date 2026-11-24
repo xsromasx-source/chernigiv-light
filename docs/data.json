@@ -1,1 +1,9 @@
-{"channel":"chernigivoblenergo","checked_at":null,"latest_chart":null,"latest_notice":null,"history":[]}
+{
+  "channel": "chernigivoblenergo",
+  "checked_at": null,
+  "latest_chart": null,
+  "previous_chart": null,
+  "latest_change": null,
+  "latest_notice": null,
+  "history": []
+}
