@@ -262,7 +262,7 @@ def create_horizontal_chart(image_path, post_id):
         top_second = max(0, round(rows[halfway][0] * sy) - pad_y)
         bottom_second = min(height, round(rows[-1][1] * sy) + pad_y)
         if (top_first >= bottom_first or top_second >= bottom_second or
-                bottom_first >= top_second or x1 - x0 < 100):
+                x1 - x0 < 100):
             return None
 
         first = original.crop((x0, top_first, x1, bottom_first))
