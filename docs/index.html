@@ -191,6 +191,35 @@ footer{color:var(--muted);border-top:1px solid #273951;font-size:12px;padding:16
   footer{font-size:9px}
 }
 
+
+/* Village / outage group identifier, visible above all three cards. */
+.location-banner{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:0 0 12px;
+  padding:9px 14px;
+  border:1px solid #536582;
+  border-radius:12px;
+  background:#21334d;
+  color:var(--ink);
+  font-size:clamp(16px,2.1vw,21px);
+  font-weight:800;
+  line-height:1.2;
+  letter-spacing:.01em;
+  text-align:center;
+}
+@media(max-width:600px){
+  .location-banner{padding:8px 10px;margin-bottom:10px;border-radius:10px;font-size:16px}
+}
+@media(min-width:900px){
+  .location-banner{flex:0 0 auto;margin:0 0 6px;padding:5px 10px;font-size:16px;line-height:1.15}
+}
+@media(min-width:900px) and (max-height:650px){
+  .location-banner{margin-bottom:4px;padding:3px 9px;font-size:14px}
+}
+
 </style>
 </head>
 <body>
@@ -199,6 +228,7 @@ footer{color:var(--muted);border-top:1px solid #273951;font-size:12px;padding:16
  <div class="identity"><span class="bolt">⚡</span><div><b>ГРАФІК СВІТЛА</b><small>ЧЕРНІГІВСЬКА ОБЛАСТЬ</small></div></div>
  <a class="headerlink" href="https://t.me/chernigivoblenergo" target="_blank" rel="noopener noreferrer">Telegram ↗</a>
 </header>
+<div class="location-banner" aria-label="Населений пункт і черга відключень">с.Піски - група 5.2</div>
 <div class="stack">
  <section class="panel panel-primary" aria-labelledby="currentTitle">
   <div class="panel-head"><div class="panel-title"><span class="index">01</span><h1 id="currentTitle">Останній графік відключень</h1></div><span class="tag">АКТУАЛЬНИЙ</span></div>
