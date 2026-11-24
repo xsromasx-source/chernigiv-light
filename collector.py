@@ -239,42 +239,45 @@ def create_horizontal_chart(image_path, post_id):
         if min(before_height, after_height) / max(before_height, after_height) < .52:
             return None
 
-        # Shrink only the unused vertical band between the heading and the
-        # first row of tiles; keep all text, logos and chart cells.
-        last_header_ink = None
-        ink_threshold = max(3, int(sw * .016 / step))
-        for y in range(first_row):
-            ink = 0
-            for x in range(0, sw, step):
+        # Keep only the table, cutting away the original heading entirely.
+        # Use the orange-coloured group cells to find safe outer bounds.
+        left_x, right_x = sw, 0
+        for y in range(rows[0][0], rows[-1][1], 2):
+            for x in range(0, sw, 2):
                 red, green, blue = pixels[x, y]
-                if min(red, green, blue) < 205:
-                    ink += 1
-            if ink >= ink_threshold:
-                last_header_ink = y
-        header_bottom = top_groups
-        if last_header_ink is not None:
-            header_bottom = min(top_groups,
-                                max(30, round((last_header_ink + 10) * sy)))
-        header = original.crop((0, 0, width, header_bottom))
-        first = original.crop((0, top_groups, width, divide))
-        second = original.crop((0, divide, width, height))
+                if (red >= 145 and 65 <= green <= 246 and
+                        red - green >= 12 and green - blue >= 11):
+                    left_x = min(left_x, x)
+                    right_x = max(right_x, x)
+        if right_x <= left_x or (right_x - left_x) < sw * .18:
+            return None
 
-        gutter = max(12, round(width * .025))
-        out_width = 2 * width + gutter
-        # Double the size of the heading to fit the combined lower sections.
-        header_height = round(header.height * out_width / width)
-        margin = max(8, round(width * .012))
-        out_height = header_height + margin + max(first.height, second.height)
+        sx = width / sw
+        pad_x = max(9, round(width * .019))
+        pad_y = max(8, round(height * .012))
+        x0 = max(0, int(left_x * sx) - pad_x)
+        x1 = min(width, int((right_x + 2) * sx) + pad_x)
+        top_first = max(0, round(rows[0][0] * sy) - pad_y)
+        bottom_first = min(height, round(rows[halfway - 1][1] * sy) + pad_y)
+        top_second = max(0, round(rows[halfway][0] * sy) - pad_y)
+        bottom_second = min(height, round(rows[-1][1] * sy) + pad_y)
+        if (top_first >= bottom_first or top_second >= bottom_second or
+                bottom_first >= top_second or x1 - x0 < 100):
+            return None
+
+        first = original.crop((x0, top_first, x1, bottom_first))
+        second = original.crop((x0, top_second, x1, bottom_second))
+        gutter = max(12, round((x1 - x0) * .025))
+        out_width = first.width + second.width + gutter
+        out_height = max(first.height, second.height)
         combined = Image.new("RGB", (out_width, out_height), "#f8fafb")
-        combined.paste(header.resize((out_width, header_height),
-                                     Image.Resampling.LANCZOS), (0, 0))
-        combined.paste(first, (0, header_height + margin))
-        combined.paste(second, (width + gutter, header_height + margin))
+        combined.paste(first, (0, 0))
+        combined.paste(second, (first.width + gutter, 0))
         stream = BytesIO()
         combined.save(stream, "JPEG", quality=94, optimize=True)
         raw = stream.getvalue()
         digest = hashlib.sha256(raw).hexdigest()[:12]
-        name = str(post_id) + "-horizontal-v2-" + digest + ".jpg"
+        name = str(post_id) + "-horizontal-v3-" + digest + ".jpg"
         IMAGE_DIR.mkdir(parents=True, exist_ok=True)
         dest = IMAGE_DIR / name
         dest.write_bytes(raw)
@@ -286,6 +289,34 @@ def create_horizontal_chart(image_path, post_id):
         return None
 
 
+# Date of the SCHEDULE, not the Telegram publication date.
+MONTH_NAMES = ("січня", "лютого", "березня", "квітня", "травня", "червня",
+               "липня", "серпня", "вересня", "жовтня", "листопада", "грудня")
+MONTH_PATTERN = re.compile(
+    r"(?<!\d)([0-3]?\d)\s+(" + "|".join(MONTH_NAMES) +
+    r")(?:\s+(\d{4})\s*(?:р(?:оку|\.)?)?)?\b", re.I
+)
+DATE_PATTERN = re.compile(r"(?<!\d)([0-3]?\d)[./]([01]?\d)[./](\d{2,4})(?!\d)")
+
+
+def date_from_graph_description(text):
+    """Read the graph's date from the original Telegram message; never guess."""
+    # The operator's date normally precedes "Графік погодинних відключень".
+    introduction = re.split(r"⚠️|Нагадуємо|Якщо ситуація", text, maxsplit=1)[0][:500]
+    found = []
+    for match in MONTH_PATTERN.finditer(introduction):
+        day, month, year = match.groups()
+        if 1 <= int(day) <= 31:
+            found.append((match.start(), f"{int(day)} {month.lower()}" +
+                          (f" {year}" if year else "")))
+    for match in DATE_PATTERN.finditer(introduction):
+        day, month, year = match.groups()
+        if 1 <= int(day) <= 31 and 1 <= int(month) <= 12:
+            year = ("20" + year) if len(year) == 2 else year
+            found.append((match.start(), f"{int(day)} {MONTH_NAMES[int(month)-1]} {year}"))
+    return min(found, key=lambda item: item[0])[1] if found else None
+
+
 def public_post(post):
     return {key: post[key] for key in ("id", "text", "date", "link")}
 
@@ -295,6 +326,7 @@ def chart_item(session, post):
     image = fetch_image(session, post["photos"][0], post["id"])
     item["image"] = image
     item["media_key"] = image.rsplit("/", 1)[-1]
+    item["graph_date"] = date_from_graph_description(post["text"])
     horizontal = create_horizontal_chart(DOCS / image, post["id"])
     if horizontal:
         item["landscape_image"] = horizontal
