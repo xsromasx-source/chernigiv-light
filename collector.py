@@ -20,12 +20,11 @@ BASE = "https://t.me/s/" + CHANNEL
 DOCS = Path(__file__).resolve().parent / "docs"
 IMAGE_DIR = DOCS / "assets" / "charts"
 HEADERS = {"User-Agent": "Mozilla/5.0", "Accept-Language": "uk,en;q=0.8"}
-SCHEDULE = re.compile(r"графік[ауі]?\s+погодинних\s+відключень|графіку\s+погодинних\s+відключень|\bгпв\b", re.I)
+# Only actual posts containing a published graph can fill the image blocks.
+GRAPH = re.compile(r"\bграфік\s+погодинних\s+відключень\b", re.I)
+# The real channel uses "маємо зміни у Графіку ...", but people also say "зміни в ...".
 CHANGES = re.compile(
-    r"маємо\s+зміни|зміни\s+(?:у|в|до)\s+графік|"
-    r"графік\s+(?:скориговано|змінено|оновлено)|"
-    r"коригування\s+графік|"
-    r"додатково\s+відключається|продовжується\s+відключення",
+    r"\b(?:маємо\s+)?зміни\s+(?:в|у)\s+графіку\s+погодинних\s+відключень\b",
     re.I,
 )
 CSS_URL = re.compile(r"url\(\s*['\"]?(https?://[^)'\"\s]+)['\"]?\s*\)", re.I)
@@ -57,6 +56,15 @@ def parse_posts(html):
     return sorted(posts, key=lambda x: x["id"], reverse=True)
 
 
+def is_change_post(post):
+    return bool(CHANGES.search(post["text"]))
+
+
+def is_graph_post(post):
+    return bool(post["photos"] and GRAPH.search(post["text"]) and
+                not is_change_post(post))
+
+
 def get_posts(session):
     collected = {}
     before = None
@@ -68,10 +76,8 @@ def get_posts(session):
         if not page:
             raise RuntimeError("Telegram did not return public posts")
         collected.update({post["id"]: post for post in page})
-        charts = [p for p in collected.values()
-                  if SCHEDULE.search(p["text"][:600]) and p["photos"]]
-        changes = [p for p in collected.values()
-                   if SCHEDULE.search(p["text"][:600]) and CHANGES.search(p["text"][:320])]
+        charts = [p for p in collected.values() if is_graph_post(p)]
+        changes = [p for p in collected.values() if is_change_post(p)]
         if len(charts) >= 2 and changes:
             break
         old = min(p["id"] for p in page)
@@ -129,31 +135,21 @@ def main():
     session = requests.Session()
     posts = get_posts(session)
 
-    # A schedule with a photo is a graph. Changes often come as text-only posts,
-    # and must not replace the chart image.
-    charts = [p for p in posts if p["photos"] and SCHEDULE.search(p["text"][:600])]
-    normal_charts = [p for p in charts if not CHANGES.search(p["text"][:320])]
+    # Correction posts may also contain images: never show them as charts.
+    # Telegram message IDs increase over time, so the first two are newest.
+    charts = [p for p in posts if is_graph_post(p)]
     if not charts:
-        raise RuntimeError("No schedule images found in recent Telegram posts")
+        raise RuntimeError("No graph posts with an image and the required phrase found")
 
-    # Prefer regular graph publications over an attached image in a correction
-    # only if the latter is not actually the newer graphic.
-    ordered = sorted(charts, key=lambda p: p["id"], reverse=True)
-    latest = chart_item(session, ordered[0])
+    latest = chart_item(session, charts[0])
     previous = None
-    if len(ordered) > 1:
+    if len(charts) > 1:
         try:
-            previous = chart_item(session, ordered[1])
+            previous = chart_item(session, charts[1])
         except Exception:
-            logging.exception("Could not download previous schedule image")
-    elif normal_charts and normal_charts[0]["id"] != ordered[0]["id"]:
-        try:
-            previous = chart_item(session, normal_charts[0])
-        except Exception:
-            logging.exception("Could not download older schedule image")
+            logging.exception("Could not download previous graph")
 
-    updates = [p for p in posts
-               if SCHEDULE.search(p["text"][:600]) and CHANGES.search(p["text"][:320])]
+    updates = [p for p in posts if is_change_post(p)]
     notice = public_post(updates[0]) if updates else None
     payload = {
         "channel": CHANNEL,
