@@ -184,13 +184,21 @@ async function refreshData() {
   const response=await fetch("data.json?t="+Date.now(),{cache:"no-store"});
   if(!response.ok)throw new Error("HTTP "+response.status);
   const data=await response.json();
-  const current=data.latest_chart || (data.history||[])[0] || null;
-  const previous=data.previous_chart || (data.history||[]).find(post=>current&&post.id!==current.id) || null;
+  // Recheck categories in the browser so stale JSON cannot present a
+  // correction message with an image as the main or previous graph.
+  const graphPhrase=/графік\s+погодинних\s+відключень/i;
+  const changePhrase=/(?:маємо\s+)?зміни\s+(?:в|у)\s+графіку\s+погодинних\s+відключень/i;
+  const possible=[data.latest_chart,data.previous_chart,...(Array.isArray(data.history)?data.history:[])];
+  const graphs=possible.filter(post=>post&&post.image&&graphPhrase.test(post.text||"")&&!changePhrase.test(post.text||""))
+                       .sort((a,b)=>Number(b.id)-Number(a.id));
+  const current=graphs[0]||null;
+  const previous=graphs.find(post=>current&&post.id!==current.id)||null;
   fillChart("current",current);
   fillChart("previous",previous);
-  const legacy=data.latest_notice;
-  const change=data.latest_change || (legacy && /маємо\s+зміни|зміни\s+[ув]\s+графік/i.test(legacy.text||"") ? legacy : null);
-  fillChange(change);
+  const changes=[data.latest_change,data.latest_notice]
+                .filter(post=>post&&changePhrase.test(post.text||""))
+                .sort((a,b)=>Number(b.id)-Number(a.id));
+  fillChange(changes[0]||null);
   $("check").textContent=data.checked_at?"Дані перевірено: "+formatDate(data.checked_at):"Ще немає успішної перевірки Telegram";
   $("status").textContent=current?"Дані графіків отримано":"Очікуємо першого завантаження";
  }catch(error){$("status").textContent="Помилка отримання даних";console.warn(error)}
