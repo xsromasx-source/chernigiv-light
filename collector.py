@@ -166,6 +166,110 @@ def fetch_image(session, url, post_id):
     return "assets/charts/" + name
 
 
+def create_horizontal_chart(image_path, post_id):
+    """Keep the heading above; set the upper and lower GROUP ROWS side by side.
+
+    Never split through group cells. If the row separators cannot be detected
+    confidently, keep displaying the original picture instead.
+    """
+    try:
+        with Image.open(image_path) as opened:
+            original = opened.convert("RGB")
+        width, height = original.size
+        if width < 180 or height < 220:
+            return None
+
+        small = original.copy()
+        small.thumbnail((680, 1100), Image.Resampling.LANCZOS)
+        sw, sh = small.size
+        pixels = small.load()
+        step = 2
+        threshold = max(8, int(sw * .065 / step))
+
+        # Orange / peach coloured tiles define graph rows in the source artwork.
+        active_rows = []
+        for y in range(sh):
+            warm = 0
+            for x in range(0, sw, step):
+                red, green, blue = pixels[x, y]
+                if (red >= 145 and 65 <= green <= 246 and
+                        red - green >= 12 and green - blue >= 11):
+                    warm += 1
+            active_rows.append(warm >= threshold)
+
+        runs = []
+        start = None
+        for y, present in enumerate(active_rows + [False]):
+            if present and start is None:
+                start = y
+            elif not present and start is not None:
+                runs.append((start, y))
+                start = None
+
+        # Heal tiny holes within a tile caused by text or compression noise.
+        merged = []
+        max_hole = max(2, int(sh * .006))
+        for a, b in runs:
+            if merged and a - merged[-1][1] <= max_hole:
+                merged[-1] = (merged[-1][0], b)
+            else:
+                merged.append((a, b))
+        min_row_height = max(10, int(sh * .025))
+        rows = [(a, b) for a, b in merged if b - a >= min_row_height]
+        if len(rows) < 2 or len(rows) % 2 or len(rows) > 10:
+            logging.info("Skip horizontal chart %s: found %s group rows", post_id, len(rows))
+            return None
+
+        first_row = rows[0][0]
+        if not (.06 * sh <= first_row <= .50 * sh):
+            return None
+        halfway = len(rows) // 2
+        cut_sample = (rows[halfway - 1][1] + rows[halfway][0]) / 2
+        # Separators must be free of coloured table cells.
+        if rows[halfway][0] - rows[halfway - 1][1] < 3:
+            return None
+
+        sy = height / sh
+        top_groups = max(0, round((first_row - max(3, sh * .009)) * sy))
+        divide = round(cut_sample * sy)
+        if not (28 < top_groups < divide - 50 < height - 100):
+            return None
+        before_height = divide - top_groups
+        after_height = height - divide
+        if min(before_height, after_height) / max(before_height, after_height) < .52:
+            return None
+
+        header = original.crop((0, 0, width, top_groups))
+        first = original.crop((0, top_groups, width, divide))
+        second = original.crop((0, divide, width, height))
+
+        gutter = max(12, round(width * .025))
+        out_width = 2 * width + gutter
+        # Double the size of the heading to fit the combined lower sections.
+        header_height = round(top_groups * out_width / width)
+        margin = max(8, round(width * .012))
+        out_height = header_height + margin + max(first.height, second.height)
+        combined = Image.new("RGB", (out_width, out_height), "#f8fafb")
+        combined.paste(header.resize((out_width, header_height),
+                                     Image.Resampling.LANCZOS), (0, 0))
+        combined.paste(first, (0, header_height + margin))
+        combined.paste(second, (width + gutter, header_height + margin))
+        stream = BytesIO()
+        combined.save(stream, "JPEG", quality=94, optimize=True)
+        raw = stream.getvalue()
+        digest = hashlib.sha256(raw).hexdigest()[:12]
+        name = str(post_id) + "-horizontal-v1-" + digest + ".jpg"
+        IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+        dest = IMAGE_DIR / name
+        dest.write_bytes(raw)
+        logging.info("Horizontal layout %s: rows=%s, %sx%s -> %sx%s",
+                     post_id, len(rows), width, height, out_width, out_height)
+        return "assets/charts/" + name
+    except Exception:
+        logging.exception("Horizontal layout failed for Telegram post %s", post_id)
+        return None
+
+
 def public_post(post):
     return {key: post[key] for key in ("id", "text", "date", "link")}
 
@@ -175,6 +279,9 @@ def chart_item(session, post):
     image = fetch_image(session, post["photos"][0], post["id"])
     item["image"] = image
     item["media_key"] = image.rsplit("/", 1)[-1]
+    horizontal = create_horizontal_chart(DOCS / image, post["id"])
+    if horizontal:
+        item["landscape_image"] = horizontal
     return item
 
 
