@@ -129,7 +129,7 @@ function fillChart(prefix, post) {
  const mediaKey = String(post.media_key || post.id);
  const key = post.id+":"+mediaKey;
  const before = prefix==="current"?currentKey:previousKey;
- if (key !== before) {
+ if (key !== before || img.classList.contains("hidden")) {
   img.src=post.image+"?v="+encodeURIComponent(mediaKey);
   img.classList.remove("hidden");empty.classList.add("hidden");
   if(prefix==="current")currentKey=key;else previousKey=key;
