@@ -254,7 +254,12 @@ header .headerlink{grid-column:3;justify-self:end}
    A readable date from the Telegram caption replaces it above the two groups. */
 .graph-date-title{display:none}
 @media (min-width:900px){
-  .panel .photo{flex-direction:column}
+  /* Keep the headline immediately above the actual chart artwork,
+     rather than separated by the flexible empty picture area. */
+  .panel .photo{
+    flex-direction:column;
+    justify-content:flex-end;
+  }
   .panel .photo .graph-date-title:not(.hidden){
     display:block;
     flex:0 0 auto;
@@ -262,12 +267,15 @@ header .headerlink{grid-column:3;justify-self:end}
     max-width:100%;
     min-width:0;
     box-sizing:border-box;
-    padding:6px 10px 5px;
+    margin-top:auto;
+    padding:2px 8px 3px;
     text-align:center;
     color:#f0f5ff;
-    font-weight:800;
-    font-size:clamp(12px,1.15vw,20px);
-    line-height:1.15;
+    font-weight:900;
+    font-stretch:expanded;
+    letter-spacing:.025em;
+    font-size:clamp(20px,2.1vw,32px);
+    line-height:1.05;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:clip;
@@ -275,15 +283,27 @@ header .headerlink{grid-column:3;justify-self:end}
   .panel .photo .graph-picture{
     height:auto;
     min-height:0;
+    max-height:calc(100% - 52px);
     width:100%;
-    flex:1 1 0;
+    flex:0 1 auto;
+    align-items:flex-start;
+  }
+  .panel .photo .graph-picture img{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:100%;
+    object-fit:contain;
   }
 }
 @media(min-width:900px) and (max-height:650px){
   .panel .photo .graph-date-title:not(.hidden){
-    padding:3px 8px;
-    font-size:clamp(11px,1vw,15px);
-    line-height:1.1;
+    padding:1px 7px 2px;
+    font-size:clamp(18px,1.8vw,28px);
+    line-height:1.05;
+  }
+  .panel .photo .graph-picture{
+    max-height:calc(100% - 40px);
   }
 }
 
@@ -364,7 +384,7 @@ function fitGraphDateTitle(title){
  if(!title || title.classList.contains("hidden") || !window.matchMedia("(min-width:900px)").matches)return;
  if(title.clientWidth<=0)return;
  title.style.whiteSpace="nowrap";
- const ideal=Math.min(20,Math.max(14,window.innerWidth*0.0115));
+ const ideal=Math.min(32,Math.max(20,title.clientWidth*0.042));
  title.style.fontSize=ideal+"px";
  let size=ideal;
  while(title.scrollWidth>title.clientWidth && size>10){
